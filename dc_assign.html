@@ -1,0 +1,1122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Scrambling Simulation</title>
+    <style>
+        * {
+    box-sizing: border-box;
+    font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    margin: 0;
+    padding: 20px;
+    background: linear-gradient(135deg, #121212 0%, #1e1e2e 100%);
+    min-height: 100vh;
+    color: #e0e0e0;
+}
+
+.container {
+    max-width: 900px;
+    margin: 0 auto;
+    background-color: #1a1a2e;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    padding: 30px;
+    transition: all 0.3s ease;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+h1 {
+    color: #5cffd1;
+    text-align: center;
+    margin-bottom: 30px;
+    font-weight: 700;
+    position: relative;
+    padding-bottom: 15px;
+}
+
+h1::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    width: 100px;
+    height: 4px;
+    background: linear-gradient(90deg, #03e5f9, #00b894);
+    transform: translateX(-50%);
+    border-radius: 2px;
+}
+
+.section {
+    margin-bottom: 25px;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    background-color: #242439;
+    border: 1px solid #2d2d4a;
+    transition: all 0.3s ease;
+}
+
+.section:hover {
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+    transform: translateY(-2px);
+}
+
+.input-section {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+textarea, input, select {
+    padding: 14px;
+    border: 1px solid #3a3a5d;
+    border-radius: 8px;
+    font-size: 15px;
+    transition: all 0.3s ease;
+    background-color: #0f0f23;
+    color: #e0e0e0;
+}
+
+textarea:focus, input:focus, select:focus {
+    outline: none;
+    border-color: #03e5f9;
+    box-shadow: 0 0 0 3px rgba(92, 255, 209, 0.2);
+    background-color: #161630;
+}
+
+textarea {
+    min-height: 120px;
+    resize: vertical;
+}
+
+label {
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: #a0a0d0;
+    display: block;
+}
+
+button {
+    padding: 14px 24px;
+    background-color: #03e5f9 ;
+    color: #0f0f23;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 10px rgba(92, 255, 209, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    position: relative;
+    overflow: hidden;
+}
+
+button::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.3) 50%, rgba(255,255,255,0) 100%);
+    transform: rotate(45deg);
+    transition: all 0.5s ease;
+    opacity: 0;
+}
+
+button:hover {
+    background: linear-gradient(135deg, #00b894 0%, #009b7a 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(92, 255, 209, 0.5);
+}
+
+button:hover::after {
+    left: 100%;
+    opacity: 1;
+}
+
+button:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 5px rgba(92, 255, 209, 0.3);
+}
+
+.result-section {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.data-display {
+    font-family: 'Roboto Mono', monospace;
+    padding: 18px;
+    background-color: #0f0f23;
+    border: 1px solid #2d2d4a;
+    border-radius: 8px;
+    overflow-x: auto;
+    white-space: pre;
+    font-size: 16px;
+    color: #bd93f9;
+    transition: all 0.3s ease;
+}
+
+.data-display:hover {
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.graph-container {
+    width: 100%;
+    height: 250px;
+    margin-top: 20px;
+    position: relative;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+canvas {
+    border: 1px solid #2d2d4a;
+    border-radius: 8px;
+    background-color: #0f0f23;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+}
+
+canvas:hover {
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+}
+
+.tab-container {
+    display: flex;
+    margin-bottom: 25px;
+    background-color: #161630;
+    border-radius: 10px;
+    padding: 5px;
+    position: relative;
+    z-index: 1;
+}
+
+.tab {
+    padding: 12px 24px;
+    cursor: pointer;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    flex: 1;
+    text-align: center;
+    position: relative;
+    z-index: 2;
+    color: #8888bf;
+}
+
+.tab:hover {
+    color: #a0a0d0;
+}
+
+.tab.active {
+    background-color: #242439;
+    color: #5cffd1;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.explanation {
+    margin-top: 25px;
+    padding: 20px;
+    background-color: #161630;
+    border-radius: 8px;
+    border-left: 4px solid #ff79c6;
+}
+
+table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin-top: 15px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+th {
+    padding: 16px;
+    background-color: #191930;
+    font-weight: 600;
+    color: #5cffd1;
+    text-align: left;
+    border-bottom: 2px solid #2d2d4a;
+}
+
+td {
+    padding: 14px 16px;
+    text-align: left;
+    border-bottom: 1px solid #2d2d4a;
+    color: #e0e0e0;
+}
+
+tr:last-child td {
+    border-bottom: none;
+}
+
+tr:nth-child(even) {
+    background-color: #1a1a2e;
+}
+
+tr:hover {
+    background-color: #242444;
+}
+
+.header-section {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.header-section h3 {
+    color: #ff79c6;
+    margin-bottom: 10px;
+    font-weight: 600;
+    position: relative;
+    display: inline-block;
+    padding-bottom: 8px;
+}
+
+.header-section h3::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    width: 60px;
+    height: 3px;
+    background: linear-gradient(90deg, #ff79c6, #bd93f9);
+    transform: translateX(-50%);
+    border-radius: 2px;
+}
+
+.graph-title {
+    text-align: center;
+    font-weight: 600;
+    color: #a0a0d0;
+    margin-bottom: 15px;
+    font-size: 16px;
+    position: relative;
+}
+
+.graph-title::before, .graph-title::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    width: 50px;
+    height: 1px;
+    background-color: #3a3a5d;
+}
+
+.graph-title::before {
+    right: calc(50% + 80px);
+}
+
+.graph-title::after {
+    left: calc(50% + 80px);
+}
+
+
+.technique-info {
+    background-color: #161630;
+    border-radius: 8px;
+    padding: 15px;
+    margin-top: 10px;
+    border-left: 4px solid #03e5f9;
+    transition: all 0.3s ease;
+}
+
+.technique-info:hover {
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.technique-info h4 {
+    color: #5cffd1;
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+
+.result-card {
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+    background-color: #1a1a2e;
+}
+
+.result-card:hover {
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+    transform: translateY(-2px);
+}
+
+.result-card-header {
+    background-color: #03e5f9 ;
+    color: #0f0f23;
+    padding: 15px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.result-card-header svg {
+    width: 20px;
+    height: 20px;
+}
+
+.result-card-content {
+    padding: 15px;
+    background: #1a1a2e;
+}
+
+ul {
+    padding-left: 20px;
+    color: #e0e0e0;
+}
+
+li {
+    margin-bottom: 8px;
+    line-height: 1.5;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in {
+    animation: fadeIn 0.5s ease forwards;
+}
+
+/* Loading indicator */
+.loading {
+    display: none;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid rgba(92, 255, 209, 0.2);
+    border-radius: 50%;
+    border-top-color: #03e5f9;
+    animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto+Mono&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container fade-in">
+        <h1>Data Scrambling Simulation</h1>
+        
+        <div class="section">
+            <div class="tab-container">
+                <div class="tab active" onclick="switchTab('scrambling')">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: inline-block; vertical-align: middle; margin-right: 5px;">
+                        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                        <polyline points="7.5 4.21 12 6.81 16.5 4.21"></polyline>
+                        <polyline points="7.5 19.79 7.5 14.6 3 12"></polyline>
+                        <polyline points="21 12 16.5 14.6 16.5 19.79"></polyline>
+                        <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                        <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                    </svg>
+                    Scrambling Simulator
+                </div>
+                <div class="tab" onclick="switchTab('explanation')">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: inline-block; vertical-align: middle; margin-right: 5px;">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                        <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                    </svg>
+                    How It Works
+                </div>
+            </div>
+            
+            <div id="scrambling-tab">
+                <div class="input-section">
+                    <label for="data-input">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: inline-block; vertical-align: middle; margin-right: 5px;">
+                            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                        </svg>
+                        Enter Binary Data (0s and 1s):
+                    </label>
+                    <textarea id="data-input" placeholder="Example: 10001000000">10001000000</textarea>
+                    
+                    <label for="scrambling-type">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: inline-block; vertical-align: middle; margin-right: 5px;">
+                            <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+                            <polyline points="2 17 12 22 22 17"></polyline>
+                            <polyline points="2 12 12 17 22 12"></polyline>
+                        </svg>
+                        Scrambling Technique:
+                    </label>
+                    <select id="scrambling-type">
+                        <option value="HDB3">HDB3 (High Density Bipolar 3-Zeros)</option>
+                        <option value="B8ZS">B8ZS (Bipolar with 8-Zero Substitution)</option>
+                    </select>
+                    
+                    <button onclick="performScrambling()">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                        </svg>
+                        Run Simulation
+                    </button>
+                </div>
+            </div>
+            
+            <div id="explanation-tab" style="display: none;">
+                <div class="header-section">
+                    <h3>What is Data Scrambling?</h3>
+                </div>
+                <p>Data scrambling is a technique used in data communications to avoid long sequences of constant voltage (0s or 1s) which can cause problems like loss of synchronization, baseline wander, and DC component in the transmitted signal.</p>
+                
+                <div class="header-section">
+                    <h3>Scrambling Techniques</h3>
+                </div>
+                
+                <div class="technique-info">
+                    <h4>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4CAF50" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: inline-block; vertical-align: middle; margin-right: 5px;">
+                            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                        </svg>
+                        HDB3 (High Density Bipolar 3-Zeros)
+                    </h4>
+                    <p>HDB3 is a line coding technique that replaces sequences of four consecutive zeros with a specific pattern that ensures no more than three consecutive zeros occur. It uses both positive (+) and negative (-) pulses to represent 1s while alternating their polarity.</p>
+                    <p><strong>Rules:</strong></p>
+                    <ul>
+                        <li>Each 1 bit is represented by alternating positive and negative pulses</li>
+                        <li>When four consecutive 0s occur, they are replaced with a pattern (000V or B00V) where V is a violation bit that breaks the alternating polarity rule</li>
+                    </ul>
+                </div>
+                
+                <div class="technique-info" style="margin-top: 20px;">
+                    <h4>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4CAF50" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: inline-block; vertical-align: middle; margin-right: 5px;">
+                            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                        </svg>
+                        B8ZS (Bipolar with 8-Zero Substitution)
+                    </h4>
+                    <p>B8ZS replaces sequences of eight consecutive zeros with a specific pattern containing deliberate bipolar violations.</p>
+                    <p><strong>Rules:</strong></p>
+                    <ul>
+                        <li>If the last pulse before the eight zeros was positive, the eight zeros are replaced with 000+-0-+</li>
+                        <li>If the last pulse was negative, the eight zeros are replaced with 000-+0+-</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class="section result-section" id="result-section" style="display: none;">
+            <div class="header-section">
+                <h3>Simulation Results</h3>
+            </div>
+            
+            <div class="result-card">
+                <div class="result-card-header">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="22 12 16 12 14 15 10 15 8 12 2 12"></polyline>
+                        <path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path>
+                    </svg>
+                    Original Data
+                </div>
+                <div class="result-card-content">
+                    <div id="original-data" class="data-display"></div>
+                </div>
+            </div>
+            
+            <div class="result-card" style="margin-top: 20px;">
+                <div class="result-card-header">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                        <polyline points="10 9 9 9 8 9"></polyline>
+                    </svg>
+                    Scrambled Data
+                </div>
+                <div class="result-card-content">
+                    <div id="scrambled-data" class="data-display"></div>
+                    <table id="data-table">
+                        <thead>
+                            <tr>
+                                <th>Bit Position</th>
+                                <th>Input Bit</th>
+                                <th>Encoded Value</th>
+                                <th>Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody id="data-table-body">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="header-section" style="margin-top: 30px;">
+                <h3>Signal Visualization</h3>
+            </div>
+            
+            <div class="result-card">
+                <div class="result-card-header">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                    </svg>
+                    Original Data (NRZ Format)
+                </div>
+                <div class="result-card-content">
+                    <div class="graph-container">
+                        <canvas id="original-canvas" width="800" height="250"></canvas>
+                        <div class="loading">
+                            <div class="loading-spinner"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="result-card" style="margin-top: 20px;">
+                <div class="result-card-header">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                    </svg>
+                    Scrambled Data
+                </div>
+                <div class="result-card-content">
+                    <div class="graph-container">
+                        <canvas id="scrambled-canvas" width="800" height="250"></canvas>
+                        <div class="loading">
+                            <div class="loading-spinner"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+
+let lastPolarity = 1;
+let lastNonZeroPolarity = 0; 
+
+
+function switchTab(tabName) {
+    const scramblingTab = document.getElementById('scrambling-tab');
+    const explanationTab = document.getElementById('explanation-tab');
+    const tabs = document.getElementsByClassName('tab');
+    
+    for (let tab of tabs) {
+        tab.classList.remove('active');
+    }
+    
+    if (tabName === 'scrambling') {
+        scramblingTab.style.display = 'block';
+        explanationTab.style.display = 'none';
+        tabs[0].classList.add('active');
+    } else {
+        scramblingTab.style.display = 'none';
+        explanationTab.style.display = 'block';
+        tabs[1].classList.add('active');
+    }
+}
+
+// Function to validate binary input
+function validateBinaryInput(input) {
+    return /^[01]+$/.test(input);
+}
+
+function performHDB3(data) {
+    let result = [];
+    let tableData = [];
+    let lastPolarity = 1; // 1 for positive, -1 for negative
+    let lastNonZeroPolarity = 0; // Track the polarity of the last non-zero pulse
+    
+    let i = 0;
+    while (i < data.length) {
+        if (i <= data.length - 4 && data.substring(i, i + 4) === '0000') {
+            // Check if we need to use B00V or 000V pattern
+            if (lastNonZeroPolarity > 0) {
+                // Last non-zero was positive, use B00V
+                result.push(lastPolarity); // B pulse
+                tableData.push({
+                    position: i,
+                    input: '0',
+                    output: lastPolarity,
+                    note: 'B pulse (first in B00V)'
+                });
+                
+                result.push(0);
+                result.push(0);
+                tableData.push({
+                    position: i+1,
+                    input: '0',
+                    output: 0,
+                    note: 'Second zero in B00V'
+                });
+                tableData.push({
+                    position: i+2,
+                    input: '0',
+                    output: 0,
+                    note: 'Third zero in B00V'
+                });
+                
+                result.push(lastPolarity); // V pulse (same polarity as B)
+                tableData.push({
+                    position: i+3,
+                    input: '0',
+                    output: lastPolarity,
+                    note: 'V pulse (violation, same polarity as B)'
+                });
+            } else {
+                // Last non-zero was negative, use 000V
+                result.push(0);
+                result.push(0);
+                result.push(0);
+                tableData.push({
+                    position: i,
+                    input: '0',
+                    output: 0,
+                    note: 'First zero in 000V'
+                });
+                tableData.push({
+                    position: i+1,
+                    input: '0',
+                    output: 0,
+                    note: 'Second zero in 000V'
+                });
+                tableData.push({
+                    position: i+2,
+                    input: '0',
+                    output: 0,
+                    note: 'Third zero in 000V'
+                });
+                
+                result.push(lastPolarity); // V pulse
+                tableData.push({
+                    position: i+3,
+                    input: '0',
+                    output: lastPolarity,
+                    note: 'V pulse (violation)'
+                });
+            }
+            
+            lastNonZeroPolarity = lastPolarity;
+            i += 4;
+            
+        } else if (data[i] === '1') {
+            result.push(lastPolarity);
+            lastNonZeroPolarity = lastPolarity;
+            
+            tableData.push({
+                position: i,
+                input: '1',
+                output: lastPolarity,
+                note: 'Normal 1 bit (alternating polarity)'
+            });
+            
+            lastPolarity = -lastPolarity; // Alternate polarity for next 1
+            i++;
+            
+        } else {
+            result.push(0);
+            
+            tableData.push({
+                position: i,
+                input: '0',
+                output: 0,
+                note: 'Normal 0 bit'
+            });
+            i++;
+        }
+    }
+    
+    return { result, tableData };
+}
+
+function performB8ZS(data) {
+    let result = [];
+    let tableData = [];
+    let lastPolarity = 1; // 1 for positive, -1 for negative
+    
+    let i = 0;
+    while (i < data.length) {
+        if (i <= data.length - 8 && data.substring(i, i + 8) === '00000000') {
+            // First three zeros remain unchanged
+            result.push(0);
+            result.push(0);
+            result.push(0);
+            
+            tableData.push({
+                position: i,
+                input: '0',
+                output: 0,
+                note: '1st zero in B8ZS pattern'
+            });
+            tableData.push({
+                position: i+1,
+                input: '0',
+                output: 0,
+                note: '2nd zero in B8ZS pattern'
+            });
+            tableData.push({
+                position: i+2,
+                input: '0',
+                output: 0,
+                note: '3rd zero in B8ZS pattern'
+            });
+            
+            if (lastPolarity === 1) {
+                result.push(1);  // +
+                result.push(-1); // -
+                result.push(0);  // 0
+                result.push(-1); // -
+                result.push(1);  // +
+                
+                tableData.push({
+                    position: i+3,
+                    input: '0',
+                    output: 1,
+                    note: '4th zero -> + pulse'
+                });
+                tableData.push({
+                    position: i+4,
+                    input: '0',
+                    output: -1,
+                    note: '5th zero -> - pulse'
+                });
+                tableData.push({
+                    position: i+5,
+                    input: '0',
+                    output: 0,
+                    note: '6th zero -> 0'
+                });
+                tableData.push({
+                    position: i+6,
+                    input: '0',
+                    output: -1,
+                    note: '7th zero -> - pulse'
+                });
+                tableData.push({
+                    position: i+7,
+                    input: '0',
+                    output: 1,
+                    note: '8th zero -> + pulse'
+                });
+                
+                lastPolarity = 1; // Update last polarity
+            } else {
+                // Last pulse was negative, use 000-+0+-
+                result.push(-1); // -
+                result.push(1);  // +
+                result.push(0);  // 0
+                result.push(1);  // +
+                result.push(-1); // -
+                
+                tableData.push({
+                    position: i+3,
+                    input: '0',
+                    output: -1,
+                    note: '4th zero -> - pulse'
+                });
+                tableData.push({
+                    position: i+4,
+                    input: '0',
+                    output: 1,
+                    note: '5th zero -> + pulse'
+                });
+                tableData.push({
+                    position: i+5,
+                    input: '0',
+                    output: 0,
+                    note: '6th zero -> 0'
+                });
+                tableData.push({
+                    position: i+6,
+                    input: '0',
+                    output: 1,
+                    note: '7th zero -> + pulse'
+                });
+                tableData.push({
+                    position: i+7,
+                    input: '0',
+                    output: -1,
+                    note: '8th zero -> - pulse'
+                });
+                
+                lastPolarity = -1; // Update last polarity
+            }
+            
+            i += 8;
+            
+        } else if (data[i] === '1') {
+            result.push(lastPolarity);
+            
+            tableData.push({
+                position: i,
+                input: '1',
+                output: lastPolarity,
+                note: 'Normal 1 bit (alternating polarity)'
+            });
+            
+            lastPolarity = -lastPolarity; // Alternate polarity for next 1
+            i++;
+            
+        } else {
+            result.push(0);
+            
+            tableData.push({
+                position: i,
+                input: '0',
+                output: 0,
+                note: 'Normal 0 bit'
+            });
+            i++;
+        }
+    }
+    
+    return { result, tableData };
+}
+
+
+function drawOriginalSignal(data, canvas) {
+    const ctx = canvas.getContext('2d');
+    const width = canvas.width;
+    const height = canvas.height;
+    
+
+    ctx.clearRect(0, 0, width, height);
+    
+
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = '#4CAF50';
+    ctx.lineJoin = 'round';
+    
+  
+    ctx.beginPath();
+    ctx.moveTo(10, height/2);
+    ctx.lineTo(width-10, height/2);
+    ctx.strokeStyle = '#ccc';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+    
+    
+    ctx.beginPath();
+    ctx.moveTo(30, 20);
+    ctx.lineTo(30, height-20);
+    ctx.stroke();
+    
+    
+    ctx.fillStyle = '#555';
+    ctx.font = '12px Arial';
+    
+    ctx.fillText('+1', 10, height/4);
+    ctx.fillText('0', 10, height/2);
+    ctx.fillText('-1', 10, 3*height/4);
+    
+    ctx.strokeStyle = '#03e5f9';
+    ctx.lineWidth = 3;
+    
+    const bitWidth = (width - 60) / data.length;
+    
+    ctx.beginPath();
+    
+    for (let i = 0; i < data.length; i++) {
+        const x1 = 30 + i * bitWidth;
+        const x2 = 30 + (i+1) * bitWidth;
+        
+        const y = data[i] === '1' ? height/4 : height/2;
+        
+        if (i === 0) {
+            ctx.moveTo(x1, y);
+        } else {
+            if ((data[i] === '1' && data[i-1] === '0') || 
+                (data[i] === '0' && data[i-1] === '1')) {
+                ctx.lineTo(x1, y);
+            }
+        }
+        
+        ctx.lineTo(x2, y);
+        
+        ctx.fillText(data[i], x1 + bitWidth/2 - 4, height - 10);
+        
+        ctx.fillText(i.toString(), x1 + bitWidth/2 - 4, height - 30);
+    }
+    
+    ctx.stroke();
+}
+
+function drawScrambledSignal(data, canvas) {
+    const ctx = canvas.getContext('2d');
+    const width = canvas.width;
+    const height = canvas.height;
+    
+    
+    ctx.clearRect(0, 0, width, height);
+    
+   
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = '#03e5f9';
+    ctx.lineJoin = 'round';
+    
+    
+    ctx.beginPath();
+    ctx.moveTo(10, height/2);
+    ctx.lineTo(width-10, height/2);
+    ctx.strokeStyle = '#ccc';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+    
+    
+    ctx.beginPath();
+    ctx.moveTo(30, 20);
+    ctx.lineTo(30, height-20);
+    ctx.stroke();
+    
+    
+    ctx.fillStyle = '#555';
+    ctx.font = '12px Arial';
+    
+    ctx.fillText('+1', 10, height/4);
+    ctx.fillText('0', 10, height/2);
+    ctx.fillText('-1', 10, 3*height/4);
+    
+    
+    const bitWidth = (width - 60) / data.length;
+    
+    ctx.beginPath();
+    ctx.moveTo(30, height/2); 
+    
+    for (let i = 0; i < data.length; i++) {
+        const x1 = 30 + i * bitWidth;
+        const x2 = 30 + (i+1) * bitWidth;
+        
+        
+        let y;
+        if (data[i] === 1) {
+            y = height/4; 
+        } else if (data[i] === -1) {
+            y = 3*height/4; 
+        } else {
+            y = height/2;
+        }
+        
+        ctx.lineTo(x1, y);
+        ctx.lineTo(x2, y);
+        
+        
+        ctx.fillText(i.toString(), x1 + bitWidth/2 - 4, height - 30);
+    }
+    
+    ctx.strokeStyle = '#03e5f9';
+    ctx.lineWidth = 3;
+    ctx.stroke();
+}
+
+function updateDataTable(tableData) {
+    const tableBody = document.getElementById('data-table-body');
+    tableBody.innerHTML = '';
+    
+    for (const row of tableData) {
+        const tr = document.createElement('tr');
+        
+        const positionTd = document.createElement('td');
+        positionTd.textContent = row.position;
+        tr.appendChild(positionTd);
+        
+        const inputTd = document.createElement('td');
+        inputTd.textContent = row.input;
+        tr.appendChild(inputTd);
+        
+        const outputTd = document.createElement('td');
+        outputTd.textContent = row.output;
+        tr.appendChild(outputTd);
+        
+        const noteTd = document.createElement('td');
+        noteTd.textContent = row.note;
+        tr.appendChild(noteTd);
+        
+        tableBody.appendChild(tr);
+    }
+}
+
+function displayScrambledData(result) {
+    let displayText = '';
+    for (const bit of result) {
+        if (bit === 1) {
+            displayText += '+ ';
+        } else if (bit === -1) {
+            displayText += '- ';
+        } else {
+            displayText += '0 ';
+        }
+    }
+    return displayText.trim();
+}
+
+
+function performScrambling() {
+    const dataInput = document.getElementById('data-input').value;
+    const scramblingType = document.getElementById('scrambling-type').value;
+    
+    
+    if (!validateBinaryInput(dataInput)) {
+        alert('Please enter valid binary data (only 0s and 1s)');
+        return;
+    }
+    
+    
+    document.getElementById('result-section').style.display = 'block';
+    
+   
+    const originalDataDisplay = document.getElementById('original-data');
+    originalDataDisplay.textContent = dataInput;
+    
+    
+    let scrambledResult, tableData;
+    if (scramblingType === 'HDB3') {
+        ({ result: scrambledResult, tableData } = performHDB3(dataInput));
+    } else {
+        ({ result: scrambledResult, tableData } = performB8ZS(dataInput));
+    }
+    
+   
+    const scrambledDataDisplay = document.getElementById('scrambled-data');
+    scrambledDataDisplay.textContent = displayScrambledData(scrambledResult);
+    
+  
+    updateDataTable(tableData);
+    
+
+    const originalCanvas = document.getElementById('original-canvas');
+    const scrambledCanvas = document.getElementById('scrambled-canvas');
+    
+    drawOriginalSignal(dataInput, originalCanvas);
+    drawScrambledSignal(scrambledResult, scrambledCanvas);
+    
+    document.getElementById('result-section').scrollIntoView({ behavior: 'smooth' });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+
+    document.getElementById('data-input').value = '10001000000';
+    
+    performScrambling();
+});
+</script>
+</body>
+</html>
